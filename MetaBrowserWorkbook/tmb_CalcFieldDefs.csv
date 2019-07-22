@@ -1,0 +1,70 @@
+FieldName;Definition
+[Calculation_0060522110001578];"[Quantity] * [Unit Cost]"
+[Calculation_0210523080923151];"DATE(DATEADD('week',1,[Purchase Date]))"
+[Calculation_1700522110136211];"[Total Cost] + [Total Cost] * [Markup %]"
+[Calculation_1860522113029566];"//Tests for missing middle initial with ISNULL function
+//If no middle initial, concatenates last name, comma, first name
+//Otherwise, concatentes last name, comma, first name, space, uppercase middle initial, and period
+
+IF ISNULL([Customer Middle Initial]) THEN
+    [Customer Last Name ProperCase] + ", " + [Customer First Name ProperCase]
+ELSE
+    [Customer Last Name ProperCase] + ", " + [Customer First Name ProperCase] + " " + UPPER([Customer Middle Initial]) + "."
+END"
+[Calculation_2220522134708424];"//"Bins" the Markup % field into three categories
+//This will create a dimension based on the Markup % measure
+
+If [Markup %] >= .35 Then "High"
+ElseIf [Markup %] >= .20 Then "Medium"
+Else "Low"
+End"
+[Calculation_2270522113840541];"[Discounted Retail] - [Total Cost]"
+[Calculation_4370522112206350];"[Retail Total] - [Retail Total] * [Discount Numeric]"
+[Calculation_4400522112349281];"//Converts inconsistent caes of the Last Name field to consistent "proper" case
+//First character (determined by LEFT function) is converted to upper case
+//Rest of characters (determined by length of string, minus 1, using RIGHT) are converted to lower case
+
+UPPER(LEFT([Customer Last Name],1)) + LOWER(RIGHT([Customer Last Name],LEN([Customer Last Name])-1))"
+[Calculation_5470522111243076];"DATE(MID(STR([Date]),5,2) + '/' + RIGHT(STR([Date]),2) + '/' + LEFT(STR([Date]),4))"
+[Calculation_5610522111702202];"//Converts string percentage value to numeric percentage value
+//FLOAT returns a decimal (non-integer) result
+//String is parsed with LEFT and LEN functions to remove the percent sign
+
+FLOAT(LEFT([Discount %],LEN([Discount %])-1)) * .01"
+[Calculation_8280522114313236];"//Searches for the hyphen in Product Type-SKU with FIND
+//Retrieves the number of characters from the left of Product Type-SKU based on one less than the positiion of the hyphen
+//Uses CASE logic to test for three possible values, returning Unknown if an unexpected value is found 
+
+CASE LEFT([Product Type-SKU], FIND([Product Type-SKU],"-")-1)
+    WHEN "SFT" THEN "Software"
+    WHEN "HD" THEN "Hardware"
+    WHEN "ACC" THEN "Accessory"
+    ELSE "Unknown"
+END"
+[Customer Last Name ProperCase (copy)];"//Converts inconsistent caes of the First Name field to consistent "proper" case
+//First character (determined by LEFT function) is converted to upper case
+//Rest of characters (determined by length of string, minus 1, using RIGHT) are converted to lower case
+
+UPPER(LEFT([Customer First Name],1)) + LOWER(RIGHT([Customer First Name],LEN([Customer First Name])-1))"
+[Aggregated Profitable? (copy)];"If [Profit] > 0 Then
+    "Yes"
+Else
+    "No"
+End"
+[Calculation_1670524163029162];"CASE [Department]
+    WHEN "Furniture" THEN [Sales] * .95
+    WHEN "Office Supplies" THEN [Sales] * 1.2
+    WHEN "Technology" THEN [Sales] * 1.15
+END"
+[Calculation_5870522145230655];"//Uses Table Calcuation formula syntax (copied from Sum of Sales Table Calc) to assign colors to bars
+If RUNNING_SUM(SUM([Sales])) / TOTAL(SUM([Sales])) <= .8 Then
+    "Within 80%"
+Else
+    "Outside 80%"
+End"
+[Calculation_6900522180956613];"If SUM([Profit]) > 0 Then
+    "Yes"
+Else
+    "No"
+End"
+[Profit (bin) 2];"[Profit]"
