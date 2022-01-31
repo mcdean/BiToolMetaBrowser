@@ -55,6 +55,10 @@ namespace BiToolMetaBrowser {
                 var caption = colNode.Attributes["caption"]?.Value;
                 var isParam = colNode.Attributes["param-domain-type"] != null;
 
+                //Fields have been found to be duplicated
+                //TODO: Determine if skipping them is appropriate
+                if (FieldNameMap.ContainsKey(name)) continue;
+
                 //columns may have no caption
                 if (caption != null) {
                     FieldNameMap.Add(name, $"[{caption}]");
